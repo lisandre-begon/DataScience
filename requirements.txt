@@ -1,0 +1,11 @@
+pandas
+numpy
+matplotlib
+seaborn
+requests
+# Pour la partie géo si vous en avez besoin :
+# geopandas
+# shapely
+# fiona
+# pyproj
+# scikit-learn
