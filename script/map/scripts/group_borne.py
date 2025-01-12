@@ -5,20 +5,17 @@ from datetime import datetime
 
 data = pd.read_csv("../../../data/processed/IRVE_geo.csv", sep=",")
 
-grouped = data.groupby(['latitude', 'longitude']).size().reset_index(name='count')
+data['year'] = pd.to_datetime(data['date_mise_en_service'], format='%Y-%m-%d', errors='coerce').dt.year.astype(int, errors='ignore')
 
-print(data['date_mise_en_service'])
+grouped = data.groupby(['latitude', 'longitude', 'year']).size().reset_index(name='count')
 
-#pour tout les elements de la colonne date_mise_en_service
-years = []
-for i in range(len(data['date_mise_en_service'])):
-    if(str(data['date_mise_en_service'][i]) != "nan"):
-        date_object = datetime.strptime(str(data['date_mise_en_service'][i]), "%Y-%m-%d")
-        year = date_object.year
-        if year not in years:
-            years.append(year)
-print("years :")
-print(years)
-        
-print("Nouveau fichier CSV généré : output.csv")
+num_elements = len(grouped)
+print(f"Number of elements in the CSV file: {num_elements}")
+
+initial_count = len(grouped)
+grouped = grouped.dropna(subset=['year'])
+final_count = len(grouped)
+print(f"Number of rows removed: {initial_count - final_count}")
+
+grouped.to_csv("../../../data/processed/grouped_borne.csv", index=False)
 
