@@ -1,58 +1,54 @@
 import folium
 import pandas as pd
 from folium.plugins import HeatMap
+import os
 
-def create_layer():
-    print("Création de la couche Heatmap des bornes")
+import routes_map
+
+def create_and_save_heatmaps():
+    print("Création des Heatmaps par année...")
 
     # Charger les données
-    data = pd.read_csv("../../data/processed/grouped_borne.csv", sep=",")  # Remplacez par le chemin de votre fichier
+    data = pd.read_csv("../../data/processed/grouped_borne.csv", sep=",")  # Remplacez par le chemin correct
+
+    # Créer un dossier pour stocker les cartes
+    output_dir = "bornes"
+    os.makedirs(output_dir, exist_ok=True)
 
     # Récupération des années uniques
-    years = data['year'].unique()
-    print("Années disponibles dans les données:", years)
+    years = sorted(data['year'].unique())
+    print("Années disponibles :", years)
 
-    layer_tab = []
+    # Définir les limites de la France
+    france_bounds = [[41.0, -5.0], [51.5, 9.0]]
 
-    # Création d'une HeatMap par année
-    for y in years:
+    # Création et sauvegarde de la Heatmap pour chaque année
+    for year in years:
+        print(f"Création de la Heatmap pour l'année {year}...")
+
+        # Préparation des données de la Heatmap
         heat_data = []
         max_count = data['count'].max()
 
-        # Récupérer les coordonnées pondérées par le nombre de bornes
-        for _, row in data[data['year'] < y].iterrows():
-            heat_data.append([
-                row["latitude"],
-                row["longitude"],
-                row["count"]/max_count  # Poids basé sur le nombre de bornes
-            ])
+        for _, row in data[data['year'] <= year].iterrows():
+            heat_data.extend([
+                [row["latitude"], row["longitude"]] for _ in range(int(row["count"]))]
+            )
 
-        # Création de la couche HeatMap
-        heat_layer = folium.FeatureGroup(name=f"Heatmap {y}", show=False)
-        HeatMap(heat_data, radius=15, blur=15, max_zoom=10, min_opacity=0.4).add_to(heat_layer)
-        layer_tab.append(heat_layer)
+        # Créer la carte
+        carte = folium.Map(location=[46.603354, 1.888334], zoom_start=6)
+        carte.fit_bounds(france_bounds)
 
-    print("Couche Heatmap créée")
-    return layer_tab
 
-# Définir les limites de la France
-france_bounds = [[41.0, -5.0], [51.5, 9.0]]
+        # Ajouter la Heatmap
+        HeatMap(heat_data, radius=15, blur=15, max_zoom=10, min_opacity=0.4).add_to(carte)
 
-# Créer la carte centrée sur la France
-carte = folium.Map(location=[46.603354, 1.888334], zoom_start=6)
-carte.fit_bounds(france_bounds)
+        # Sauvegarder la carte pour l'année en cours
+        file_path = os.path.join(output_dir, f"carte_{year}.html")
+        carte.save(file_path)
+        print(f"Carte sauvegardée : {file_path}")
 
-# Ajouter la couche Heatmap
-res = create_layer()
-if isinstance(res, list):
-    for el in res:
-        el.add_to(carte)
-else:
-    res.add_to(carte)
+    print("Toutes les cartes Heatmap ont été générées et sauvegardées.")
 
-# Ajouter le contrôle des couches
-folium.LayerControl().add_to(carte)
-
-# Sauvegarder la carte
-carte.save("carte_bornes_heatmap.html")
-print("Carte Heatmap générée : carte_bornes_heatmap.html")
+# Exécuter la fonction
+create_and_save_heatmaps()
