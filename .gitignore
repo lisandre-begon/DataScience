@@ -1,0 +1,31 @@
+# ---- Fichiers Python ----
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+
+# ---- Environnements virtuels ----
+env/
+venv/
+.venv/
+
+# ---- Jupyter Notebook checkpoints ----
+.ipynb_checkpoints/
+
+# ---- Fichiers de logs ----
+*.log
+
+# ---- Données brutes / sensibles (à adapter) ----
+data/raw/
+data/processed/*.csv
+# Si tu souhaites partager tes fichiers nettoyés, 
+# enlève la ligne ci-dessus ou commente-la.
+
+# ---- Autres ----
+*.sqlite
+*.db
+*.pdf
+*.png
+*.jpg
