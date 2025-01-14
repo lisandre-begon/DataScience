@@ -1,0 +1,78 @@
+---
+title: "Analyse des données : Test Khi2"
+output: html_document
+---
+
+## 1. Introduction
+
+L'objectif de ce document est d'analyser la corrélation entre plusieurs variables à l'aide du test Khi2. Les variables concernées proviennent de quatre ensembles de données : les bornes de recharge (IRVE), la population, le trafic routier (TMJA) et les immatriculations de véhicules électriques (VE). Nous utiliserons le test Khi2 pour déterminer si certaines variables sont indépendantes ou si une corrélation significative existe entre elles.
+
+## 2. Importation des fichiers CSV
+
+Les données ont été importées comme suit :
+
+```{r setup, echo=TRUE}
+# Chargement des bibliothèques nécessaires
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# Importation des fichiers CSV
+irve <- read.csv("~/Library/Mobile Documents/com~apple~CloudDocs/Semestre 7/Projet Data Science/DataScience/data/processed/grouped_borne.csv")
+population <- read.csv("~/Library/Mobile Documents/com~apple~CloudDocs/Semestre 7/Projet Data Science/DataScience/data/cities_population.csv")
+tmja <- read.csv("~/Library/Mobile Documents/com~apple~CloudDocs/Semestre 7/Projet Data Science/DataScience/data/processed/TMJA2019_geo.csv")
+immatriculation <- read.csv("~/Library/Mobile Documents/com~apple~CloudDocs/Semestre 7/Projet Data Science/DataScience/data/processed/immatr_geo.csv")
+
+# Nettoyage des données : suppression des NA et normalisation
+irve_clean <- irve %>%
+  filter(!is.na(longitude) & !is.na(latitude))
+
+population_clean <- population %>%
+  filter(!is.na(valeur_population))
+
+tmja_clean <- tmja %>%
+  filter(!is.na(TMJA))
+
+immatriculation_clean <- immatriculation %>%
+  filter(!is.na(NB_VP_RECHARGEABLES_EL))
+
+# Fusion des données en fonction des zones géographiques communes (par exemple, par code_geo)
+combined_data <- merge(irve_clean, population_clean, by.x = "city_code", by.y = "city_code", all = TRUE)
+combined_data <- merge(combined_data, tmja_clean, by.x = "city_code", by.y = "city_code", all = TRUE)
+combined_data <- merge(combined_data, immatriculation_clean, by.x = "city_code", by.y = "city_code", all = TRUE)
+
+# Création des catégories de population
+combined_data$population_cat <- cut(combined_data$valeur_population, 
+                                    breaks = c(0, 5000, 10000, 50000, 100000, Inf), 
+                                    labels = c("0-5000", "5000-10000", "10000-50000", "50000-100000", "100000+"))
+
+# Création d'un tableau de contingence
+contingency_population_bornes <- table(combined_data$population_cat, combined_data$count)
+
+# Test Khi2
+khi2_population_bornes <- chisq.test(contingency_population_bornes)
+khi2_population_bornes
+
+# Création des catégories de trafic TMJA
+combined_data$tmja_cat <- cut(combined_data$TMJA, 
+                              breaks = c(0, 5000, 10000, 50000, 100000, Inf), 
+                              labels = c("0-5000", "5000-10000", "10000-50000", "50000-100000", "100000+"))
+
+# Création d'un tableau de contingence
+contingency_tmja_bornes <- table(combined_data$tmja_cat, combined_data$count)
+
+# Test Khi2
+khi2_tmja_bornes <- chisq.test(contingency_tmja_bornes)
+khi2_tmja_bornes
+
+# Création des catégories d'immatriculations de VE
+combined_data$ve_cat <- cut(combined_data$NB_VP_RECHARGEABLES_EL, 
+                            breaks = c(0, 500, 1000, 5000, 10000, Inf), 
+                            labels = c("0-500", "500-1000", "1000-5000", "5000-10000", "10000+"))
+
+# Création d'un tableau de contingence
+contingency_immatriculations_bornes <- table(combined_data$ve_cat, combined_data$count)
+
+# Test Khi2
+khi2_immatriculations_bornes <- chisq.test(contingency_immatriculations_bornes)
+khi2_immatriculations_bornes
