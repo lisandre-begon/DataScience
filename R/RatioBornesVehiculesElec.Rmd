@@ -1,0 +1,163 @@
+---
+title: "DataScienceProject"
+author: "Aloïs Drucké"
+date: "2025-01-14"
+output: html_document
+---
+On telecharge les bibliotheques necessaires et on import les données
+```{r}
+install.packages("dplyr")
+install.packages("readr")
+install.packages("ggplot2")
+
+library(dplyr)
+library(readr)
+library(ggplot2)
+
+bornes <- read_csv("./Documents/UM/Polytech/IG4/S7/Data Science/Project/DataScience/data/processed/IRVE_clean.csv")
+immatriculations <- read_csv("./Documents/UM/Polytech/IG4/S7/Data Science/Project/DataScience/data/processed/immatr_geo.csv")
+immatriculationsMathis <- read_delim("./Documents/UM/Polytech/IG4/S7/Data Science/Project/DataScience/data/processed/voitures-par-commune-par-energie.csv",delim = ";")
+immatriculations3 <- read_csv("./Documents/UM/Polytech/IG4/S7/Data Science/Project/DataScience/data/processed/immatr_geo2.csv")
+```
+
+Nettoyer les colonnes inutiles ou redondantes, gérer les valeurs manquantes et convertir les dates.
+
+```{r }
+
+bornes_clean <- bornes %>%
+  select(nom_amenageur, nbre_pdc, date_mise_en_service, code_insee_commune, latitude, longitude, id_pdc_itinerance) %>%
+  mutate(date_mise_en_service = as.Date(date_mise_en_service, format = "%Y-%m-%d")) %>%
+  filter(!is.na(date_mise_en_service))
+
+bornes_2020 <- bornes_clean %>%
+  filter(date_mise_en_service >= as.Date("2020-01-01"))
+
+# nrow(bornes_2020)
+
+# immatriculations_clean <- immatriculations %>%
+#   select(year, code_geo, DATE_ARRETE, NB_VP_RECHARGEABLES_EL) %>%
+#   mutate(
+#     DATE_ARRETE = as.Date(DATE_ARRETE, format = "%Y-%m-%d"),
+#     annee_mois = format(DATE_ARRETE, "%Y-%m")
+#   )
+# 
+# immatriculations_par_mois <- immatriculations_clean %>%
+#   group_by(annee_mois) %>%
+#   summarise(
+#     total_vehicules_electriques = sum(NB_VP_RECHARGEABLES_EL, na.rm = TRUE),
+#     .groups = "drop"
+#   )
+# 
+# immatriculationsMathis_clean <- immatriculationsMathis %>%
+#   select(DATE_ARRETE, NB_VP_RECHARGEABLES_EL, NB_VP) %>%
+#   mutate(
+#     DATE_ARRETE = as.Date(DATE_ARRETE, format = "%Y-%m-%d"),
+#     annee_mois = format(DATE_ARRETE, "%Y-%m")
+#   )
+# 
+# immatriculationsMathis_par_mois <- immatriculationsMathis_clean %>%
+#   group_by(annee_mois) %>%
+#   summarise(
+#     total_vehicules_electriques = sum(NB_VP_RECHARGEABLES_EL, na.rm = TRUE),
+#     .groups = "drop"
+#   )
+
+immatriculations3_clean <- immatriculations3 %>%
+  select(DATE_ARRETE, NB_VP_RECHARGEABLES_EL, NB_VP) %>%
+  mutate(
+    DATE_ARRETE = as.Date(DATE_ARRETE, format = "%Y-%m-%d"),
+    annee_mois = format(DATE_ARRETE, "%Y-%m")
+  )
+
+immatriculations3_par_mois <- immatriculations3_clean %>%
+  group_by(annee_mois) %>%
+  summarise(
+    total_vehicules_electriques = sum(NB_VP_RECHARGEABLES_EL, na.rm = TRUE),
+    .groups = "drop"
+  )
+```
+
+<!-- Agréger par année pour voir la croissance. -->
+
+<!-- ```{r } -->
+<!-- bornes_par_annee <- bornes_2020 %>% -->
+<!--   mutate(annee = as.numeric(format(date_mise_en_service, "%Y"))) %>% -->
+<!--   group_by(annee) %>% -->
+<!--   summarise(total_bornes = n_distinct(id_pdc_itinerance)) -->
+
+<!-- immatriculations_par_annee <- immatriculations_clean %>% -->
+<!--   group_by(year) %>% -->
+<!--   summarise(total_vehicules_electriques = sum(nb_vehicules_electriques, na.rm = TRUE)) -->
+
+<!-- ``` -->
+
+<!-- <!-- colnames(bornes_par_annee) --> -->
+<!-- <!-- colnames(immatriculations_par_annee) --> -->
+<!-- <!-- immatriculations_par_annee <- immatriculations_par_annee %>% --> -->
+<!-- <!--   rename(annee = year) --> -->
+
+<!-- Joindre les deux jeux de données pour comparer la croissance. -->
+
+<!-- ```{r} -->
+<!-- croissance <- merge(bornes_par_annee, immatriculations_par_annee, by = "annee", all = TRUE) -->
+
+<!-- croissance <- croissance %>% -->
+<!--   mutate(croissance_bornes = (total_bornes / lag(total_bornes) - 1) * 100, -->
+<!--          croissance_vehicules = (total_vehicules_electriques / lag(total_vehicules_electriques) - 1) * 100) -->
+<!-- ``` -->
+
+
+
+<!-- ```{r} -->
+<!-- ggplot(croissance, aes(x = annee)) + -->
+<!--   geom_line(aes(y = total_bornes, color = "Bornes de recharge"), linewidth = 1) + -->
+<!--   geom_line(aes(y = total_vehicules_electriques, color = "Véhicules électriques"), linewidth = 1) + -->
+<!--   labs(title = "Croissance des bornes de recharge et des véhicules électriques", -->
+<!--        x = "Année", y = "Total", -->
+<!--        color = "Légende") + -->
+<!--   theme_minimal() -->
+
+<!-- ggplot(croissance, aes(x = annee)) + -->
+<!--   geom_bar(aes(y = croissance_bornes, fill = "Bornes"), stat = "identity", position = "dodge") + -->
+<!--   geom_bar(aes(y = croissance_vehicules, fill = "Véhicules"), stat = "identity", position = "dodge") + -->
+<!--   labs(title = "Taux de croissance annuel", -->
+<!--        x = "Année", y = "Croissance (%)", -->
+<!--        fill = "Type") + -->
+<!--   theme_minimal() -->
+
+<!-- ``` -->
+
+Dans les deux jeux de données (bornes et immatriculations), ajoutez une colonne qui extrait l'année et le mois des dates.
+
+```{r}
+bornes_2020 <- bornes_2020 %>%
+  mutate(annee_mois = format(date_mise_en_service, "%Y-%m"))
+```
+
+Calculez le nombre total de bornes et de voitures électriques par mois.
+
+```{r}
+bornes_par_mois <- bornes_2020 %>%
+  group_by(annee_mois) %>%
+  summarise(total_bornes = n_distinct(id_pdc_itinerance))
+
+```
+
+Fusion puis ajout de la colonne ratio
+
+```{r}
+ratio_par_mois <- merge(bornes_par_mois, immatriculations3_par_mois, by = "annee_mois", all = TRUE)
+
+ratio_par_mois <- ratio_par_mois %>%
+  mutate(ratio = total_vehicules_electriques / total_bornes)
+
+head(ratio_par_mois)
+```
+j'ai observe quil y avait des valeurs que pour certains mois dans la colonne total_vehicules_electriques donc je selexctionne ces mois la
+
+```{r}
+ratio_par_mois_filtered <- ratio_par_mois %>%
+  filter(!is.na(total_vehicules_electriques))
+
+ratio_par_mois_filtered
+```
