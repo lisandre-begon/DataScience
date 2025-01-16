@@ -8,7 +8,7 @@ def app():
     selected_year = st.slider("Sélectionnez l'année :", min_value=2000, max_value=2025, step=1)
 
     # Génération dynamique du chemin de la carte HTML
-    file_path = f"../script/map/bornes/carte_{selected_year}.0.html"
+    file_path = f"../script/map/cartes_bornes/carte_{selected_year}.0.html"
 
     # Chargement de la carte HTML sélectionnée
     try:

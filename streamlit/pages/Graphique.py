@@ -6,31 +6,30 @@ st.title("Évolution des infrastructures de recharge et des immatriculations de 
 
 @st.cache_data
 def load_data_bornes():
-    data = dd.read_csv('/Users/zolan/Library/Mobile Documents/com~apple~CloudDocs/Semestre 7/Projet Data Science/DataScience/data/processed/grouped_borne.csv')
+    data = dd.read_csv('../data/processed/grouped_borne.csv')
     return data.compute()
 
 data_bornes = load_data_bornes()
 data_agg_bornes = data_bornes.groupby('year')['count'].sum().reset_index()
 
+# Calcul de la somme cumulée des bornes
+data_agg_bornes['cumulative_count'] = data_agg_bornes['count'].cumsum()
+
+# Visualisation avec la somme cumulée
 fig_bornes = px.line(
     data_agg_bornes, 
     x='year', 
-    y='count', 
-    title="Évolution du nombre de bornes de recharge dans le temps"
+    y='cumulative_count',  # On utilise la somme cumulée
+    title="Évolution cumulée du nombre de bornes de recharge dans le temps",
+    labels={'cumulative_count': 'Nombre cumulé de bornes'}
 )
-fig_bornes.update_layout(
-    xaxis_title="Année", 
-    yaxis_title="Nombre de bornes de recharge", 
-    xaxis=dict(tickmode='linear', tick0=2012, dtick=1, range=[2012, 2024]),
-    yaxis=dict(showgrid=True, gridcolor='rgba(255, 255, 255, 0.3)'),
-    hovermode="x unified"  # Affiche la valeur pour chaque point au passage du curseur
-)
+
 st.plotly_chart(fig_bornes)
 
 @st.cache_data
 def load_data_immatriculations():
     data = dd.read_csv(
-        '/Users/zolan/Library/Mobile Documents/com~apple~CloudDocs/Semestre 7/Projet Data Science/DataScience/data/processed/immatr_geo.csv',
+        '../data/processed/immatr_geo.csv',
         dtype={'code_geo': str},
         usecols=['year', 'NB_VP_RECHARGEABLES_EL']
     )

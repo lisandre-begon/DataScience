@@ -89,5 +89,30 @@ def generate_maps():
         carte.save(file_path)
         print(f"Carte sauvegardée : {file_path}")
 
-# Lancer la génération
-generate_maps()
+from datetime import datetime
+
+def get():
+    # Charger les données
+    data = pd.read_csv("../../data/processed/immatr_geo.csv", sep=",")
+    print("coucou")
+
+    # Obtenir les années uniques
+
+    data['year'] = pd.to_datetime(data['DATE_ARRETE'], format="%Y-%m-%d", errors='coerce').dt.year
+    
+    years = sorted(data['year'].dropna().unique())
+
+    france_bounds = [[41.0, -5.0], [51.5, 9.0]]
+    res = []
+
+    for year in years:
+
+        # Ajouter les couches de l'année
+        for layer in create_layer(data, year):
+            res.append(layer)
+
+    return res
+
+
+# # Lancer la génération
+# generate_maps()

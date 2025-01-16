@@ -1,14 +1,21 @@
 import pandas as pd
 
-# Charger le fichier CSV
+# 📂 Charger le fichier CSV
 df = pd.read_csv('../../../data/processed/immatr_geo.csv', sep=",")
 
-# Calculer le rapport NB_VP_RECHARGEABLE / NB_VP
-df['RAPPORT'] = df['NB_VP_RECHARGEABLES_EL'] / df['NB_VP']
+print(df['DATE_ARRETE'])
 
-# Trier le DataFrame par le rapport en ordre décroissant et sélectionner les 10 premières lignes
-top_10_villes = df.nlargest(10, 'RAPPORT')
+# 🕒 Conversion de la colonne 'DATE_ARRETE' en datetime
+df['DATE_ARRETE'] = pd.to_datetime(df['DATE_ARRETE'], errors='coerce')
 
-# Afficher les noms des 10 villes avec le rapport le plus haut
-print("Les 10 villes avec le rapport NB_VP_RECHARGEABLE / NB_VP le plus haut sont:")
-print(top_10_villes[['city_code', 'RAPPORT']])
+# 📊 Filtrer pour obtenir la date la plus récente par CODGEO
+latest_dates = df[df['DATE_ARRETE'] == df.groupby('CODGEO')['DATE_ARRETE'].transform('max')]
+
+# print(latest_dates)
+
+
+# ➕ Calculer la somme des 'NB_VP' pour les CODGEO avec la date la plus récente
+somme_nb_vp = latest_dates.groupby('CODGEO')['NB_VP_RECHARGEABLES_EL'].sum()
+
+# 🖨️ Afficher les résultats
+print(somme_nb_vp)

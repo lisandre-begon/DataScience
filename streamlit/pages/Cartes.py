@@ -4,13 +4,14 @@ import pages.souspages.Immatriculation as Immatriculation  # Correction de l'imp
 import pages.souspages.Bornes as Bornes
 import pages.souspages.FluxRoutiers as FluxRoutiers
 import pages.souspages.Population as Population
+import pages.souspages.Fusion as Fusion
 
 st.title("Cartes")
 
 # Menu de sélection
 menu = st.selectbox(
     "Choisissez la carte :",
-    ["Immatriculation", "Bornes", "Flux routiers"]
+    ["Immatriculation", "Bornes", "Flux routiers", "Population", "Fusion"]
 )
 
 # Affichage en fonction du choix
@@ -22,5 +23,7 @@ elif(menu == "Flux routiers"):
     FluxRoutiers.app()
 elif(menu == "Population"):
     Population.app()
+elif(menu == "Fusion"):
+    Fusion.app()
 else:
     st.write("Erreur de choix")
