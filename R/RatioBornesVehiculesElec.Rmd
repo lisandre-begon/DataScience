@@ -161,3 +161,35 @@ ratio_par_mois_filtered <- ratio_par_mois %>%
 
 ratio_par_mois_filtered
 ```
+
+```{r}
+
+# Construire un modèle linéaire reliant ratio, bornes et véhicules électriques
+modele <- lm(ratio ~ total_bornes + total_vehicules_electriques, data = data)
+summary(modele) # Résumé pour évaluer le modèle
+# Prédire les ratios futurs
+future_temps$ratio_prevu <- predict(modele, newdata = future_temps)
+# Combiner les données historiques et futures
+combined_data <- bind_rows(
+  data %>% mutate(source = "Historique"),
+  future_temps %>% mutate(source = "Prévision")
+)
+
+# Tracer les données
+library(ggplot2)
+ggplot(combined_data, aes(x = annee_mois, y = ratio, color = source, group = source)) +
+  geom_point() +
+  geom_line() +
+  labs(title = "Ratio Bornes / Véhicules Électriques (Historique et Prévision)",
+       x = "Mois",
+       y = "Ratio",
+       color = "Source") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+
+
+
+
