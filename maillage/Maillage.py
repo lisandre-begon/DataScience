@@ -220,7 +220,7 @@ def plot_heatmap(dossier, cells: List[Cell.Cell]):
     if dossier != "" :
         dossier = dossier + "/"
 
-    m.save(dossier+"france_heatmap.html")
+    m.save(dossier+".html")
     print("Heatmap générée et sauvegardée sous france_heatmap.html.")
 
 def csv_to_cells(csv_path: str, size: float) -> List[Cell.Cell]:
@@ -258,5 +258,5 @@ if __name__ == "__main__":
     print("Grille de France sauvegardée sous france_grid.csv.")
     
     # Générer et afficher la heatmap
-    plot_heatmap("bornes_population",france_grid)
+    plot_heatmap("bornes_population/bornes_population",france_grid)
 
