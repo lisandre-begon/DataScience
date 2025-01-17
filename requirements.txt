@@ -4,12 +4,7 @@ matplotlib
 seaborn
 streamlit
 streamlit-folium
+streamlit-option-menu
 dask
+plotly
 requests
-
-# Pour la partie géo si vous en avez besoin :
-# geopandas
-# shapely
-# fiona
-# pyproj
-# scikit-learn
