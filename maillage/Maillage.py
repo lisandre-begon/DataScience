@@ -106,7 +106,7 @@ def maillage_VE(lat: float, lon: float, cell_size : float, year = 2024) -> float
 
     # Vérifier que le dénominateur est valide (ni zéro, ni NaN, ni infini)
     if pd.notna(denominateur) and denominateur != 0 and not denominateur == float('inf'):
-        resultat = float(numerateur / denominateur) * 100000
+        resultat = float(numerateur / denominateur)
         #print(f"Division valide : numerateur = {numerateur}, denominateur = {denominateur}, resultat = {resultat}")
     else:
         resultat = 0  
@@ -152,8 +152,6 @@ def maillage_bornes_habitants(lat: float, lon: float, cell_size : float, year = 
 
     return (resultat, denominateur)
 
-
-
 def cells_to_geodataframe(cells: List[Cell.Cell]) -> gpd.GeoDataFrame:
     """
     Convertit une liste de cellules en GeoDataFrame pour visualisation.
@@ -198,7 +196,7 @@ def plot_heatmap(dossier, cells: List[Cell.Cell]):
         colors=['blue', 'green', 'yellow', 'orange', 'red'],
         vmin=min_data,
         vmax=max_data,
-        caption='Intensity of Data'
+        caption='Nombre de bornes par voitures'
     )
     colormap.add_to(m)
 
@@ -207,7 +205,7 @@ def plot_heatmap(dossier, cells: List[Cell.Cell]):
         colors=['red', 'orange', 'yellow', 'green', 'blue'],
         vmin=1/max_data,
         vmax=1/min_data,
-        caption='Intensity of Data'
+        caption='Nombre de voiture par bornes'
     )
 
     colormap.add_to(m)
@@ -240,19 +238,19 @@ def csv_to_cells(csv_path: str, size: float) -> List[Cell.Cell]:
 
 # Exemple d'utilisation
 if __name__ == "__main__":
-    cell_size = 0.20 
+    cell_size = 0.2
 
-    for i in range(2011, 2024+1):
+    for i in range(2024, 2024+1):
         max_data = 0
         min_data = 10
-        france_grid = generate_france_grid(maillage_bornes_habitants, cell_size, i)
+        france_grid = generate_france_grid(maillage_VE, cell_size, 2024)
 
         # france_grid = csv_to_cells("bornes_immatr.csv", cell_size)
 
         df = pd.DataFrame([cell.to_dict() for cell in france_grid])
-        df.to_csv("bornes_population/bornes_population.csv", index=False)
-        print("Grille de France sauvegardée sous france_grid.csv.")
+        df.to_csv("bornes_ve/bornes_ve.csv", index=False)
+        print("Grille de France sauvegardée sous bornes_ve.csv.")
         
         # Générer et afficher la heatmap
-        plot_heatmap("bornes_population/bornes_population_"+str(i),france_grid)
+        plot_heatmap("bornes_ve/bornes_ve_"+str(i),france_grid)
 

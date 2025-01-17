@@ -39,7 +39,6 @@ def create_and_save_heatmaps():
         carte = folium.Map(location=[46.603354, 1.888334], zoom_start=6)
         carte.fit_bounds(france_bounds)
 
-
         # Ajouter la Heatmap
         HeatMap(heat_data, radius=15, blur=15, max_zoom=10, min_opacity=0.4).add_to(carte)
 

@@ -1,4 +1,3 @@
-insee_code,city_code,zip_code,label,latitude,longitude,department_name,department_number,region_name,region_geojson_name
-75056,75056,75000,Paris,48.8566,2.3522,Paris,75,Île-de-France,ile-de-france
-69123,69123,69000,Lyon,45.764,4.8357,Rhône,69,Auvergne-Rhône-Alpes,auvergne-rhone-alpes
-13055,13055,13000,Marseille,43.2965,5.3698,Bouches-du-Rhône,13,Provence-Alpes-Côte d'Azur,provence-alpes-cote-d-azur
+version https://git-lfs.github.com/spec/v1
+oid sha256:fa927d33b146cb7d4435f23b34d9a0914099b05036641fab00f452e1a709f62d
+size 407

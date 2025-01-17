@@ -3,7 +3,10 @@ import plotly.express as px
 
 # Charger les données depuis un fichier CSV
 # Remplacez 'data.csv' par le chemin de votre fichier
-df = pd.read_csv('bornes_immatr.csv')
+df = pd.read_csv("../data/processed/grouped_borne.csv", low_memory=False)
+df2 = pd.read_csv("../../data/processed/immatr_geo.csv", low_memory=False)
+
+
 df['data'] = df['data'] / 1000000
 print(df['data_size'].sum())
 
