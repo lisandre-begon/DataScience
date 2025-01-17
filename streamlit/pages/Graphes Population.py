@@ -13,6 +13,7 @@ pouilloux = [46.604876131,4.35310787]
 vif = [45.04313947,5.674134613]
 lavaldens = [44.99232966,5.903427724]
 pontcharra = [45.419806496,6.020923525]
+bordeaux = [44.857621613,-0.5733793060000001]
 
 # Afficher les données dans Streamlit
 # st.write(data)
@@ -23,7 +24,7 @@ fig, ax = plt.subplots()
 # Créer un menu déroulant pour sélectionner une ville
 ville = st.selectbox(
     'Sélectionnez une ville',
-    ('Pouilloux', 'Vif', 'Lavaldens', 'Pontcharra')
+    ('Bordeaux','Pouilloux', 'Vif', 'Lavaldens', 'Pontcharra')
 )
 
 # Définir les coordonnées en fonction de la ville sélectionnée
@@ -33,6 +34,8 @@ elif ville == 'Vif':
     lat, lon = vif
 elif ville == 'Pontcharra':
     lat, lon = pontcharra
+elif ville == 'Bordeaux':
+    lat, lon = bordeaux
 else:
     lat, lon = lavaldens
 

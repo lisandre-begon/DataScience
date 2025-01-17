@@ -10,7 +10,7 @@ import pandas as pd
 max_data = 0
 min_data = 10
 
-def generate_france_grid(fonction, cell_size: float) -> List[Cell.Cell]:
+def generate_france_grid(fonction, cell_size: float, year) -> List[Cell.Cell]:
     global max_data
     global min_data
     """
@@ -31,7 +31,7 @@ def generate_france_grid(fonction, cell_size: float) -> List[Cell.Cell]:
     while lat < max_lat:
         lon = min_lon
         while lon < max_lon:
-            random_data = fonction(lat, lon, cell_size)
+            random_data = fonction(lat, lon, cell_size, year)
             if(random_data[0] != 0):
                 cell = Cell.Cell(latitude=lat + cell_size / 2,
                             longitude=lon + cell_size / 2,
@@ -84,11 +84,7 @@ def maillage_bornes(lat: float, lon: float, cell_size : float) -> float:
 
     return (resultat, denominateur)
 
-def maillage_VE(lat: float, lon: float, cell_size : float) -> float:
-
-
-
-
+def maillage_VE(lat: float, lon: float, cell_size : float, year = 2024) -> float:
     df = pd.read_csv("../data/processed/grouped_borne.csv", low_memory=False)
     df2 = pd.read_csv("../data/processed/immatr_geo.csv", low_memory=False)
     
@@ -120,7 +116,7 @@ def maillage_VE(lat: float, lon: float, cell_size : float) -> float:
 
 total_borne = 0
 
-def maillage_bornes_habitants(lat: float, lon: float, cell_size : float) -> float:
+def maillage_bornes_habitants(lat: float, lon: float, cell_size : float, year = 2024) -> float:
     global total_borne
     df_borne = pd.read_csv("../data/processed/grouped_borne.csv", low_memory=False)
     df_pop = pd.read_csv("../data/processed/pop_prediction.csv", low_memory=False)
@@ -138,7 +134,6 @@ def maillage_bornes_habitants(lat: float, lon: float, cell_size : float) -> floa
 
     lat_min, lat_max = lat, lat + cell_size # Plage de latitude
     lon_min, lon_max = lon, lon + cell_size    # Plage de longitude
-    year = 2024
 
     filtre_borne = (df_borne['latitude'].between(lat_min, lat_max)) & (df_borne['longitude'].between(lon_min, lon_max)) & (df_borne['year'] <= year)
     filtre_pop = (df_pop['latitude'].between(lat_min, lat_max)) & (df_pop['longitude'].between(lon_min, lon_max)) & (df_pop['year'] == year)
@@ -217,11 +212,9 @@ def plot_heatmap(dossier, cells: List[Cell.Cell]):
 
     colormap.add_to(m)
     # Sauvegarder la carte
-    if dossier != "" :
-        dossier = dossier + "/"
 
     m.save(dossier+".html")
-    print("Heatmap générée et sauvegardée sous france_heatmap.html.")
+    print("Heatmap générée et sauvegardée sous " + str(dossier))
 
 def csv_to_cells(csv_path: str, size: float) -> List[Cell.Cell]:
     """
@@ -247,16 +240,19 @@ def csv_to_cells(csv_path: str, size: float) -> List[Cell.Cell]:
 
 # Exemple d'utilisation
 if __name__ == "__main__":
-    cell_size = 0.25  # Taille de la cellule en degrés (~50 km)
-    france_grid = generate_france_grid(maillage_bornes_habitants, cell_size)
-    france_gdf = cells_to_geodataframe(france_grid)
+    cell_size = 0.20 
 
-    # france_grid = csv_to_cells("bornes_immatr.csv", cell_size)
+    for i in range(2011, 2024+1):
+        max_data = 0
+        min_data = 10
+        france_grid = generate_france_grid(maillage_bornes_habitants, cell_size, i)
 
-    df = pd.DataFrame([cell.to_dict() for cell in france_grid])
-    df.to_csv("bornes_population/bornes_population.csv", index=False)
-    print("Grille de France sauvegardée sous france_grid.csv.")
-    
-    # Générer et afficher la heatmap
-    plot_heatmap("bornes_population/bornes_population",france_grid)
+        # france_grid = csv_to_cells("bornes_immatr.csv", cell_size)
+
+        df = pd.DataFrame([cell.to_dict() for cell in france_grid])
+        df.to_csv("bornes_population/bornes_population.csv", index=False)
+        print("Grille de France sauvegardée sous france_grid.csv.")
+        
+        # Générer et afficher la heatmap
+        plot_heatmap("bornes_population/bornes_population_"+str(i),france_grid)
 
