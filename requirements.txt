@@ -1,8 +1,12 @@
 pandas
 numpy
 matplotlib
-seaborn
+seabornpandas
+streamlit
+streamlit-folium
+dask
 requests
+
 # Pour la partie géo si vous en avez besoin :
 # geopandas
 # shapely

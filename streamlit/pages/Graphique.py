@@ -28,12 +28,9 @@ st.plotly_chart(fig_bornes)
 
 @st.cache_data
 def load_data_immatriculations():
-    data = dd.read_csv(
-        '../data/processed/immatr_geo.csv',
-        dtype={'code_geo': str},
-        usecols=['year', 'NB_VP_RECHARGEABLES_EL']
-    )
-    data = data.sample(frac=0.1)
+    data = dd.read_csv('../data/processed/immatr_geo.csv')
+    print(data.columns)  # Print column names to verify
+    data = data[['year', 'NB_VP_RECHARGEABLES_EL']]  # Select the required columns
     return data.compute()
 
 data_immatriculations = load_data_immatriculations()
